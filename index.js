@@ -47,7 +47,7 @@ import { sanitizeInput } from "./middlewear/sanitizeInput.js"; // New sanitizer 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 
 // 🛡 Security Middleware
 app.use(helmet()); // Set secure HTTP headers
