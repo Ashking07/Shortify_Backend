@@ -86,6 +86,7 @@ await client.connect();
 // ✅ Routes
 app.use("/", redirectRouter); // mount the redirect route at root
 app.use("/api", shortenRouter); // everything else under /api
+app.use("/auth", authRoutes);
 app.use("/api/urls", urlRoutes);
 
 // Health Check
