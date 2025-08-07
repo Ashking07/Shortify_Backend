@@ -81,7 +81,9 @@ router.post("/shorten", authenticateToken, async (req, res) => {
     const cachedCode = await client.get(`shorten:${originalUrl}`);
     if (cachedCode) {
       console.log("Given by cache");
-      return res.json({ shortUrl: `http://localhost:8080/api/${cachedCode}` });
+      return res.json({
+        shortUrl: `https://shortify-backend-phlr.onrender.com/api/${cachedCode}`,
+      });
     }
 
     // 2. Check MongoDB for the original URL
@@ -100,7 +102,7 @@ router.post("/shorten", authenticateToken, async (req, res) => {
       });
 
       return res.json({
-        shortUrl: `http://localhost:8080/api/${urlDoc.shortCode}`,
+        shortUrl: `https://shortify-backend-phlr.onrender.com/api/${urlDoc.shortCode}`,
       });
     }
 
@@ -129,9 +131,9 @@ router.post("/shorten", authenticateToken, async (req, res) => {
     await client.set(`shorten:${originalUrl}`, shortCode, { EX: 1800 });
     await client.set(shortCode, originalUrl, { EX: 1800 });
 
-    return res
-      .status(201)
-      .json({ shortUrl: `http://localhost:8080/api/${shortCode}` });
+    return res.status(201).json({
+      shortUrl: `https://shortify-backend-phlr.onrender.com/api/${shortCode}`,
+    });
   } catch (err) {
     console.error("Error shortening URL:", err);
     return res.status(500).json({ error: "Internal Server Error" });
