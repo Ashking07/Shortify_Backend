@@ -71,7 +71,7 @@ app.use("/api", limiter); // Apply to all /api routes
 // ✅ CORS
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "*",
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
   })
 );
@@ -90,6 +90,12 @@ app.get("/", (req, res) => {
   res.send("Server is running securely 🔐");
 });
 
+// app.listen(PORT, () => {
+//   console.log(`✅ Server running on http://localhost:${PORT}`);
+// });
+
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(
+    `✅ Server running on https://shortify-backend-phlr.onrender.com`
+  );
 });
