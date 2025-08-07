@@ -11,59 +11,38 @@ const router = express.Router();
 // router.get("/:shortCode", async (req, res) => {
 //   const { shortCode } = req.params;
 
-//   // 1. Try Redis first
-//   const cachedUrl = await client.get(shortCode);
-//   if (cachedUrl) {
-//     console.log("✅ Cache Hit");
-//     return res.redirect(cachedUrl);
-//   }
+//   try {
+//     // 1. Try Redis first
+//     const cachedUrl = await client.get(shortCode);
+//     if (cachedUrl) {
+//       console.log("✅ Cache Hit");
 
-//   // 2. Fallback to Mongo
-//   const doc = await Url.findOne({ shortCode });
-//   if (doc) {
-//     // Cache it for future
-//     await client.set(shortCode, doc.originalUrl, { EX: 1800 }); // 30 mins TTL
-//     console.log("🔁 Cache Miss → MongoDB Hit → Caching Now");
-//     return res.redirect(doc.originalUrl);
-//   }
+//       // Increment click count in MongoDB
+//       await Url.findOneAndUpdate({ shortCode }, { $inc: { clicks: 1 } });
 
-//   return res.status(404).send("Short URL not found");
+//       return res.redirect(cachedUrl);
+//     }
+
+//     // 2. Fallback to MongoDB
+//     const doc = await Url.findOneAndUpdate(
+//       { shortCode },
+//       { $inc: { clicks: 1 } } // Increment clicks while fetching
+//     );
+
+//     if (doc) {
+//       // Cache it for next time
+//       await client.set(shortCode, doc.originalUrl, { EX: 1800 }); // 30 mins TTL
+//       console.log("🔁 Cache Miss → MongoDB Hit → Caching Now");
+
+//       return res.redirect(doc.originalUrl);
+//     }
+
+//     return res.status(404).send("Short URL not found");
+//   } catch (err) {
+//     console.error("Error during redirect:", err);
+//     return res.status(500).send("Server error");
+//   }
 // });
-router.get("/:shortCode", async (req, res) => {
-  const { shortCode } = req.params;
-
-  try {
-    // 1. Try Redis first
-    const cachedUrl = await client.get(shortCode);
-    if (cachedUrl) {
-      console.log("✅ Cache Hit");
-
-      // Increment click count in MongoDB
-      await Url.findOneAndUpdate({ shortCode }, { $inc: { clicks: 1 } });
-
-      return res.redirect(cachedUrl);
-    }
-
-    // 2. Fallback to MongoDB
-    const doc = await Url.findOneAndUpdate(
-      { shortCode },
-      { $inc: { clicks: 1 } } // Increment clicks while fetching
-    );
-
-    if (doc) {
-      // Cache it for next time
-      await client.set(shortCode, doc.originalUrl, { EX: 1800 }); // 30 mins TTL
-      console.log("🔁 Cache Miss → MongoDB Hit → Caching Now");
-
-      return res.redirect(doc.originalUrl);
-    }
-
-    return res.status(404).send("Short URL not found");
-  } catch (err) {
-    console.error("Error during redirect:", err);
-    return res.status(500).send("Server error");
-  }
-});
 
 // POST /shorten - create a new short URL
 router.post("/shorten", authenticateToken, async (req, res) => {
@@ -82,7 +61,7 @@ router.post("/shorten", authenticateToken, async (req, res) => {
     if (cachedCode) {
       console.log("Given by cache");
       return res.json({
-        shortUrl: `https://shortify-backend-phlr.onrender.com/api/${cachedCode}`,
+        shortUrl: `https://shfy.live/${cachedCode}`,
       });
     }
 
@@ -102,7 +81,7 @@ router.post("/shorten", authenticateToken, async (req, res) => {
       });
 
       return res.json({
-        shortUrl: `https://shortify-backend-phlr.onrender.com/api/${urlDoc.shortCode}`,
+        shortUrl: `https://shfy.live/${urlDoc.shortCode}`,
       });
     }
 
@@ -132,7 +111,7 @@ router.post("/shorten", authenticateToken, async (req, res) => {
     await client.set(shortCode, originalUrl, { EX: 1800 });
 
     return res.status(201).json({
-      shortUrl: `https://shortify-backend-phlr.onrender.com/api/${shortCode}`,
+      shortUrl: `https://shfy.live/${shortCode}`,
     });
   } catch (err) {
     console.error("Error shortening URL:", err);

@@ -40,6 +40,7 @@ import hpp from "hpp";
 import { connectToMongo } from "./db/mongo.js";
 import { client } from "./db/redis.js";
 import shortenRouter from "./routes/shorten.js";
+import redirectRouter from "./routes/redirect.js";
 import authRoutes from "./routes/auth.js";
 import urlRoutes from "./routes/urls.js";
 import { sanitizeInput } from "./middlewear/sanitizeInput.js"; // New sanitizer middleware
@@ -73,7 +74,7 @@ app.use(
   cors({
     origin:
       process.env.CORS_ORIGIN?.split(",") ||
-      "https://shortify-frontend-psi.vercel.app/",
+      "https://shortify-frontend-psi.vercel.app",
     credentials: true,
   })
 );
@@ -83,21 +84,17 @@ await connectToMongo();
 await client.connect();
 
 // ✅ Routes
-app.use("/api", shortenRouter);
-app.use("/auth", authRoutes);
+app.use("/", redirectRouter); // mount the redirect route at root
+app.use("/api", shortenRouter); // everything else under /api
 app.use("/api/urls", urlRoutes);
 
 // Health Check
-app.get("/", (req, res) => {
-  res.send("Server is running securely 🔐");
-});
-
-// app.listen(PORT, () => {
-//   console.log(`✅ Server running on http://localhost:${PORT}`);
+// app.get("/", (req, res) => {
+//   res.send("Shortify Backend is live at shfy.live and also on Render 🚀");
 // });
 
 app.listen(PORT, () => {
   console.log(
-    `✅ Server running on https://shortify-backend-phlr.onrender.com`
+    `✅ Server running on https://shortify-backend-phlr.onrender.com and https://shfy.live`
   );
 });
