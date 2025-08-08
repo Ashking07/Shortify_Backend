@@ -43,6 +43,7 @@ import shortenRouter from "./routes/shorten.js";
 import redirectRouter from "./routes/redirect.js";
 import authRoutes from "./routes/auth.js";
 import urlRoutes from "./routes/urls.js";
+import feedBackRouter from "./routes/feedback.js";
 import { sanitizeInput } from "./middlewear/sanitizeInput.js"; // New sanitizer middleware
 
 dotenv.config();
@@ -88,6 +89,7 @@ app.use("/", redirectRouter); // mount the redirect route at root
 app.use("/api", shortenRouter); // everything else under /api
 app.use("/auth", authRoutes);
 app.use("/api/urls", urlRoutes);
+app.use("/feedback", feedBackRouter);
 
 // Health Check
 // app.get("/", (req, res) => {
